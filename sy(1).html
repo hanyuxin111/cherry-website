@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>市场行情分析与预测</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #003;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2.4rem;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        label {
+            font-weight: bold;
+            white-space: nowrap;
+            color: #555;
+        }
+        
+        select, button {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            background-color: white;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        select {
+            min-width: 180px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234CAF50' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+            appearance: none;
+        }
+        
+        select:focus, button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+        }
+        
+        button:hover {
+            background-color: #388E3C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(76, 175, 80, 0.4);
+        }
+        
+        .button-secondary {
+            background-color: white;
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            box-shadow: none;
+        }
+        
+        .button-secondary:hover {
+            background-color: #f8f8f8;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 35px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+        
+        .analysis-container {
+            padding: 25px;
+            background-color: #f9f4f4;
+            border-radius: 15px;
+            margin-bottom: 35px;
+            border-left: 6px solid #4CAF50;
+            position: relative;
+        }
+        
+        h2 {
+            color: #4CAF50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .price-highlight {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .date-highlight {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+        }
+        
+        .info-cards {
+            display: flex;
+            gap: 25px;
+            margin-top: 35px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .card {
+            flex: 1;
+            min-width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-icon {
+            font-size: 2.2rem;
+            color: #4CAF50;
+            margin-bottom: 18px;
+        }
+        
+        .card h3 {
+            margin: 0 0 12px 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+        
+        .card p {
+            margin: 0;
+            color: #666;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .comparison-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .comparison-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .comparison-item:hover {
+            background-color: #eee;
+        }
+        
+        .comparison-item.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .comparison-item .color-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+        
+        .tab-container {
+            margin-bottom: 25px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .tab.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                padding: 18px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .control-group {
+                width: 100%;
+            }
+            
+            select, button {
+                width: 100%;
+            }
+            
+            .chart-container {
+                height: 400px;
+                padding: 15px;
+            }
+            
+            .info-cards {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .card {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+       <nav class="nav">
+           <ul class="nav-links">
+       		<li><a href="home.html">登录</a></li>
+               <li><a href="dashboard.html">首页</a></li>
+               <li><a href="planting_management.html">种植管理</a></li>
+			   <li><a href="sf.html">种植决策</a></li>
+               <li><a href="bc.html">病虫害防治</a></li>
+               <li><a href="sy.html">市场行情</a></li>
+               <li><a href="sales.html">在线销售</a></li>
+           </ul>
+       </nav>
+    </header>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-chart-line"></i> 市场行情分析与预测</h1>
+            <p class="subtitle">精准预测樱桃市场价格走势，多维度对比分析，助力农业决策</p>
+        </header>
+        
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="single">单一分析</div>
+                <div class="tab" data-tab="compare">对比分析</div>
+            </div>
+            
+            <div class="tab-content active" id="single-tab">
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label for="variety-select"><i class="fas fa-apple-alt"></i> 樱桃品种：</label>
+                        <select id="variety-select">
+                            <option value="red">红灯樱桃</option>
+                            <option value="yellow">黄蜜樱桃</option>
+                            <option value="black">黑珍珠樱桃</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="region-select"><i class="fas fa-map-marker-alt"></i> 地区：</label>
+                        <select id="region-select">
+                            <option value="shandong">山东烟台</option>
+                            <option value="liaoning">辽宁大连</option>
+                            <option value="sichuan">四川汶川</option>
+                        </select>
+                    </div>
+                    
+                    <button id="export-btn"><i class="fas fa-file-export"></i> 导出数据</button>
+                    <button id="refresh-btn"><i class="fas fa-sync-alt"></i> 刷新数据</button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+                
+                <div class="analysis-container">
+                    <h2><i class="fas fa-chart-pie"></i> 市场分析报告</h2>
+                    <div id="analysis-text">正在加载数据分析...</div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="compare-tab">
+                <div class="control-panel">
+                    <div class="control-group">
+                        <label><i class="fas fa-chart-bar"></i> 对比模式：</label>
+                        <select id="compare-mode">
+                            <option value="variety">品种对比</option>
+                            <option value="region">地区对比</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group" id="compare-variety-control">
+                        <label><i class="fas fa-apple-alt"></i> 选择品种：</label>
+                        <select id="compare-variety-select" multiple>
+                            <option value="red" selected>红灯樱桃</option>
+                            <option value="yellow" selected>黄蜜樱桃</option>
+                            <option value="black">黑珍珠樱桃</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-group" id="compare-region-control">
+                        <label><i class="fas fa-map-marker-alt"></i> 选择地区：</label>
+                        <select id="compare-region-select" multiple>
+                            <option value="shandong" selected>山东烟台</option>
+                            <option value="liaoning" selected>辽宁大连</option>
+                            <option value="sichuan">四川汶川</option>
+                        </select>
+                    </div>
+                    
+                    <button id="compare-btn" class="button-secondary"><i class="fas fa-exchange-alt"></i> 对比分析</button>
+                </div>
+                
+                <div class="comparison-controls" id="comparison-legend"></div>
+                
+                <div class="chart-container">
+                    <canvas id="compareChart"></canvas>
+                </div>
+                
+                <div class="analysis-container">
+                    <h2><i class="fas fa-balance-scale"></i> 对比分析报告</h2>
+                    <div id="compare-analysis-text">请选择对比项并点击"对比分析"按钮</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-cards">
+            <div class="card">
+                <i class="fas fa-temperature-low card-icon"></i>
+                <h3>气象影响</h3>
+                <p>未来7天气温适宜，降水概率低，有利于樱桃采摘和运输，预计不会对价格造成显著影响</p>
+            </div>
+            
+            <div class="card">
+                <i class="fas fa-truck card-icon"></i>
+                <h3>物流状态</h3>
+                <p>全国物流通畅，主要产区到消费市场运输时间缩短15%，物流成本下降8%</p>
+            </div>
+            
+            <div class="card">
+                <i class="fas fa-shopping-basket card-icon"></i>
+                <h3>市场需求</h3>
+                <p>端午节前市场需求预计增长20%，电商平台预售量同比增加35%，价格可能小幅上涨</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据生成函数
+        function generateData(startPrice, endPrice, days, startDate) {
+            const data = [];
+            const date = new Date(startDate);
+            const priceStep = (endPrice - startPrice) / (days - 1);
+            
+            for (let i = 0; i < days; i++) {
+                const currentDate = new Date(date);
+                currentDate.setDate(date.getDate() + i);
+                
+                // 添加随机波动
+                const fluctuation = (Math.random() - 0.5) * 0.8;
+                const price = startPrice + (priceStep * i) + fluctuation;
+                
+                data.push({
+                    ds: formatDate(currentDate),
+                    y: parseFloat(price.toFixed(2))
+                });
+            }
+            
+            return data;
+        }
+
+        // 模拟多数据源
+        const dataSources = {
+            red: {
+                shandong: generateData(20, 24, 8, getStartDate()),
+                liaoning: generateData(18, 22, 8, getStartDate()),
+                sichuan: generateData(22, 26, 8, getStartDate())
+            },
+            yellow: {
+                shandong: generateData(25, 28, 8, getStartDate()),
+                liaoning: generateData(23, 26, 8, getStartDate()),
+                sichuan: generateData(26, 30, 8, getStartDate())
+            },
+            black: {
+                shandong: generateData(30, 35, 8, getStartDate()),
+                liaoning: generateData(28, 33, 8, getStartDate()),
+                sichuan: generateData(32, 38, 8, getStartDate())
+            }
+        };
+
+        // 颜色配置
+        const colorPalette = [
+            '#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', 
+            '#1abc9c', '#d35400', '#34495e', '#e67e22', '#27ae60'
+        ];
+
+        // 全局变量
+        let currentData = [...dataSources.red.shandong];
+        let priceChart = null;
+        let compareChart = null;
+        let activeTab = 'single';
+
+        // 页面加载初始化
+        window.addEventListener('DOMContentLoaded', function() {
+            initEventListeners();
+            updateChartAndAnalysis();
+            initMultiSelect();
+        });
+
+        // 初始化事件监听
+        function initEventListeners() {
+            document.getElementById('variety-select').addEventListener('change', updateData);
+            document.getElementById('region-select').addEventListener('change', updateData);
+            document.getElementById('export-btn').addEventListener('click', exportData);
+            document.getElementById('refresh-btn').addEventListener('click', refreshData);
+            document.getElementById('compare-btn').addEventListener('click', updateComparison);
+            document.getElementById('compare-mode').addEventListener('change', toggleCompareMode);
+            
+            // 标签切换
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+                    activeTab = this.dataset.tab;
+                    
+                    if (activeTab === 'compare') {
+                        updateComparison();
+                    } else {
+                        updateChartAndAnalysis();
+                    }
+                });
+            });
+        }
+        
+        // 初始化多选控件
+        function initMultiSelect() {
+            const style = document.createElement('style');
+            style.textContent = `
+                select[multiple] {
+                    height: auto;
+                    min-height: 42px;
+                    padding-right: 30px;
+                }
+                
+                select[multiple] option {
+                    padding: 8px 12px;
+                }
+                
+                select[multiple] option:checked {
+                    background-color: #4CAF50;
+                    color: white;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 切换对比模式
+        function toggleCompareMode() {
+            const mode = document.getElementById('compare-mode').value;
+            document.getElementById('compare-variety-control').style.display = mode === 'variety' ? 'flex' : 'none';
+            document.getElementById('compare-region-control').style.display = mode === 'region' ? 'flex' : 'none';
+        }
+        
+        // 更新数据源
+        function updateData() {
+            const variety = document.getElementById('variety-select').value;
+            const region = document.getElementById('region-select').value;
+            currentData = [...dataSources[variety][region]];
+            updateChartAndAnalysis();
+        }
+        
+        // 刷新数据
+        function refreshData() {
+            const btn = document.getElementById('refresh-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 更新中...';
+            btn.disabled = true;
+            
+            // 模拟网络请求延迟
+            setTimeout(() => {
+                const variety = document.getElementById('variety-select').value;
+                const region = document.getElementById('region-select').value;
+                
+                // 生成新数据（模拟实际刷新）
+                dataSources[variety][region] = generateData(
+                    currentData[0].y, 
+                    currentData[currentData.length-1].y + (Math.random() > 0.5 ? 2 : -1),
+                    8,
+                    getStartDate()
+                );
+                
+                currentData = [...dataSources[variety][region]];
+                updateChartAndAnalysis();
+                
+                btn.innerHTML = '<i class="fas fa-check"></i> 已更新';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> 刷新数据';
+                    btn.disabled = false;
+                }, 1500);
+            }, 800);
+        }
+        
+        // 导出数据
+        function exportData() {
+            const btn = document.getElementById('export-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 导出中...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                try {
+                    const combinedData = getCombinedData();
+                    const BOM = '\uFEFF'; // UTF-8 BOM
+                    let csv = BOM + '日期,价格(元/公斤),类型\n';
+                    
+                    combinedData.forEach(item => {
+                        csv += `${item.ds},${item.y},${item.prediction ? '预测' : '实际'}\n`;
+                    });
+                    
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `樱桃价格_${document.getElementById('variety-select').value}_${document.getElementById('region-select').value}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    btn.innerHTML = '<i class="fas fa-check"></i> 导出成功';
+                } catch (error) {
+                    console.error('导出失败:', error);
+                    btn.innerHTML = '<i class="fas fa-times"></i> 导出失败';
+                } finally {
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-file-export"></i> 导出数据';
+                        btn.disabled = false;
+                    }, 1500);
+                }
+            }, 500);
+        }
+        
+        // 获取合并数据（实际+预测）
+        function getCombinedData() {
+            const predictedData = simpleLinearPredict(currentData, 7);
+            return [
+                ...currentData.map(item => ({ ...item, prediction: false })),
+                ...predictedData.map(item => ({ ...item, prediction: true }))
+            ];
+        }
+
+        // 简单线性预测
+        function simpleLinearPredict(data, periods) {
+            if (data.length === 0) return [];
+            
+            const lastDate = new Date(data[data.length - 1].ds);
+            const x = data.map((_, index) => index);
+            const y = data.map(item => item.y);
+            
+            // 计算回归系数 (y = mx + b)
+            const n = x.length;
+            const sumX = x.reduce((a, b) => a + b, 0);
+            const sumY = y.reduce((a, b) => a + b, 0);
+            const sumXY = x.reduce((a, val, i) => a + val * y[i], 0);
+            const sumXX = x.reduce((a, b) => a + b * b, 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            // 生成预测数据
+            return Array.from({ length: periods }, (_, i) => {
+                const daysToAdd = i + 1;
+                const nextDate = new Date(lastDate);
+                nextDate.setDate(lastDate.getDate() + daysToAdd);
+                return {
+                    ds: formatDate(nextDate),
+                    y: parseFloat((slope * (x.length + daysToAdd - 1) + intercept).toFixed(2)),
+                    prediction: true
+                };
+            });
+        }
+
+        // 日期格式化
+        function formatDate(date) {
+            const d = new Date(date);
+            return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+        }
+
+        // 获取当前日期（减去7天，作为起始日期）
+        function getStartDate() {
+            const today = new Date();
+            today.setDate(today.getDate() - 7);
+            return formatDate(today);
+        }
+
+        // 生成随机图表样式
+        function generateChartStyle() {
+            // 随机选择颜色
+            const randomColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            
+            // 随机选择线条宽度（2-5）
+            const randomBorderWidth = Math.floor(Math.random() * 4) + 2;
+            
+            // 随机选择标记点大小（4-8）
+            const randomPointSize = Math.floor(Math.random() * 5) + 4;
+            
+            // 随机选择线条张力（0-0.5）
+            const randomTension = Math.random() * 0.5;
+            
+            return {
+                borderColor: randomColor,
+                backgroundColor: `rgba(${hexToRgb(randomColor)}, 0.05)`,
+                borderWidth: randomBorderWidth,
+                tension: randomTension,
+                pointRadius: randomPointSize,
+                pointBackgroundColor: randomColor
+            };
+        }
+
+        // 将十六进制颜色转换为RGB
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result 
+                ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+                : '0, 0, 0';
+        }
+
+        // 渲染图表
+        function renderChart(data) {
+            const ctx = document.getElementById('priceChart');
+            
+            // 销毁旧图表
+            if (priceChart) {
+                priceChart.destroy();
+            }
+            
+            // 区分实际和预测数据
+            const actualData = data.filter(item => !item.prediction);
+            const predictedData = data.filter(item => item.prediction);
+            
+            // 生成随机样式
+            const actualStyle = generateChartStyle();
+            const predictedStyle = {
+                ...generateChartStyle(),
+                borderDash: [5, 5]
+            };
+            
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.ds),
+                    datasets: [
+                        {
+                            label: '实际价格',
+                            data: actualData.map(item => item.y),
+                            ...actualStyle,
+                            fill: true
+                        },
+                        {
+                            label: '预测价格',
+                            data: [...Array(actualData.length).fill(null), ...predictedData.map(item => item.y)],
+                            ...predictedStyle,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '樱桃价格趋势分析（元/公斤）',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 15
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y}元/公斤`;
+                                }
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '价格（元/公斤）',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 渲染对比图表
+        function renderCompareChart(datasets, labels) {
+            const ctx = document.getElementById('compareChart');
+            
+            // 销毁旧图表
+            if (compareChart) {
+                compareChart.destroy();
+            }
+            
+            compareChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '樱桃价格对比分析（元/公斤）',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 15
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y}元/公斤`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '价格（元/公斤）',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 生成市场分析
+        function generateMarketAnalysis(combinedData) {
+            const actualData = combinedData.filter(item => !item.prediction);
+            const predictedData = combinedData.filter(item => item.prediction);
+            
+            if (actualData.length === 0 || predictedData.length === 0) {
+                document.getElementById('analysis-text').innerHTML = '<p>暂无足够数据进行分析</p>';
+                return;
+            }
+            
+            const lastActual = actualData[actualData.length - 1];
+            const firstPredicted = predictedData[0];
+            const lastPredicted = predictedData[predictedData.length - 1];
+            
+            // 计算变化
+            const changeFromStart = ((lastPredicted.y - firstPredicted.y) / firstPredicted.y * 100).toFixed(2);
+            const totalChange = ((lastPredicted.y - lastActual.y) / lastActual.y * 100).toFixed(2);
+            
+            // 获取当前选择
+            const variety = document.getElementById('variety-select');
+            const varietyText = variety.options[variety.selectedIndex].text;
+            const region = document.getElementById('region-select');
+            const regionText = region.options[region.selectedIndex].text;
+            
+            // 构建分析报告
+            let analysisText = `
+                <p><strong>${varietyText}（${regionText}产区）价格分析</strong></p>
+                <div style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <p><i class="fas fa-calendar-alt" style="color: #3498db;"></i> <span class="date-highlight">${lastActual.ds}</span> 最新价格: <span class="price-highlight">${lastActual.y}元/公斤</span></p>
+                    <p><i class="fas fa-chart-line" style="color: #3498db;"></i> 未来趋势: ${changeFromStart > 0 ? '上涨' : '下降'} <span class="price-highlight">${Math.abs(changeFromStart)}%</span></p>
+                </div>
+            `;
+            
+            // 价格预警
+            const warningThreshold = 10; // 10%波动预警
+            if (Math.abs(totalChange) > warningThreshold) {
+                analysisText += `
+                    <div class="alert warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>价格预警！</strong>预计${totalChange > 0 ? '上涨' : '下跌'}幅度超过${warningThreshold}%，
+                        建议及时调整经营策略。
+                    </div>
+                `;
+            }
+            
+            // 市场建议
+            analysisText += `
+                <div style="background: white; padding: 20px; border-radius: 12px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <p style="font-weight: bold; color: #4CAF50; font-size: 16px;"><i class="fas fa-lightbulb"></i> 市场建议：</p>
+                    <ul style="padding-left: 25px; margin-bottom: 0;">
+            `;
+            
+            if (changeFromStart > 5) {
+                analysisText += `
+                        <li>适当延缓销售节奏，把握价格上涨机会</li>
+                        <li>批发商可考虑增加库存，但需注意市场饱和度</li>
+                        <li>零售商关注终端价格变化，适时调整售价</li>
+                `;
+            } else if (changeFromStart < -5) {
+                analysisText += `
+                        <li>加快销售进度，减少库存积压风险</li>
+                        <li>批发商控制采购量，避免资金占用</li>
+                        <li>零售商可开展促销活动，提高周转率</li>
+                `;
+            } else {
+                analysisText += `
+                        <li>市场行情稳定，按计划正常经营</li>
+                        <li>保持合理库存水平，避免过度囤货</li>
+                        <li>关注天气和市场需求变化，及时调整策略</li>
+                `;
+            }
+            
+            analysisText += `
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('analysis-text').innerHTML = analysisText;
+        }
+        
+        // 生成对比分析
+        function generateCompareAnalysis(datasets) {
+            if (!datasets || datasets.length === 0) return;
+            
+            let analysisText = '<div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+            
+            // 计算最高价、最低价和平均价
+            const lastPrices = datasets.map(d => d.data[d.data.length - 1]);
+            const maxPrice = Math.max(...lastPrices);
+            const minPrice = Math.min(...lastPrices);
+            const avgPrice = (lastPrices.reduce((a, b) => a + b, 0) / lastPrices.length).toFixed(2);
+            
+            // 找出最高和最低的品种/地区
+            const maxItem = datasets.find(d => d.data[d.data.length - 1] === maxPrice);
+            const minItem = datasets.find(d => d.data[d.data.length - 1] === minPrice);
+            
+            const mode = document.getElementById('compare-mode').value;
+            const isVarietyCompare = mode === 'variety';
+            
+            analysisText += `
+                <p><strong>${isVarietyCompare ? '品种' : '地区'}价格对比分析</strong></p>
+                <p>当前最高价: <span class="price-highlight">${maxPrice}元/公斤</span> (${maxItem.label})</p>
+                <p>当前最低价: <span class="price-highlight">${minPrice}元/公斤</span> (${minItem.label})</p>
+                <p>平均价格: <span class="price-highlight">${avgPrice}元/公斤</span></p>
+                
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #eee;">
+                    <p style="font-weight: bold; color: #4CAF50;"><i class="fas fa-info-circle"></i> 分析结论：</p>
+                    <ul style="padding-left: 25px; margin-bottom: 0;">
+            `;
+            
+            if ((maxPrice - minPrice) / minPrice > 0.15) {
+                analysisText += `
+                        <li>${isVarietyCompare ? '品种间' : '地区间'}价格差异较大，存在明显的${isVarietyCompare ? '品种' : '区域'}溢价</li>
+                        <li>${maxItem.label}价格较高，可能反映其${isVarietyCompare ? '品质优势或市场偏好' : '运输成本或品牌效应'}</li>
+                        <li>${minItem.label}价格较低，${isVarietyCompare ? '可考虑提升品质或营销策略' : '可能具有成本优势或需改善物流效率'}</li>
+                `;
+            } else {
+                analysisText += `
+                        <li>${isVarietyCompare ? '品种间' : '地区间'}价格差异较小，市场相对均衡</li>
+                        <li>${maxItem.label}与${minItem.label}价差不大，${isVarietyCompare ? '消费者可根据个人偏好选择' : '采购时可综合考虑物流时效和成本'}</li>
+                `;
+            }
+            
+            analysisText += `
+                    </ul>
+                </div>
+            `;
+            
+            analysisText += '</div>';
+            document.getElementById('compare-analysis-text').innerHTML = analysisText;
+        }
+        
+        // 更新对比分析
+        function updateComparison() {
+            const mode = document.getElementById('compare-mode').value;
+            const legendContainer = document.getElementById('comparison-legend');
+            legendContainer.innerHTML = '';
+            
+            let datasets = [];
+            let labels = [];
+            
+            if (mode === 'variety') {
+                // 品种对比模式
+                const selectedVarieties = Array.from(document.getElementById('compare-variety-select').selectedOptions).map(o => o.value);
+                const region = document.getElementById('region-select').value;
+                
+                if (selectedVarieties.length < 2) {
+                    alert('请至少选择2个品种进行对比');
+                    return;
+                }
+                
+                // 获取所有选中品种的数据
+                selectedVarieties.forEach((variety, i) => {
+                    const data = dataSources[variety][region];
+                    const varietyName = document.querySelector(`#compare-variety-select option[value="${variety}"]`).text;
+                    
+                    // 为每个数据集生成随机样式
+                    const style = generateChartStyle();
+                    
+                    datasets.push({
+                        label: `${varietyName} (${document.querySelector('#region-select option:checked').text})`,
+                        data: data.map(d => d.y),
+                        ...style
+                    });
+                    
+                    // 添加图例项
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'comparison-item active';
+                    legendItem.innerHTML = `
+                        <span class="color-indicator" style="background-color: ${style.borderColor}"></span>
+                        ${varietyName}
+                    `;
+                    legendContainer.appendChild(legendItem);
+                });
+                
+                labels = dataSources[selectedVarieties[0]][region].map(d => d.ds);
+            } else {
+                // 地区对比模式
+                const selectedRegions = Array.from(document.getElementById('compare-region-select').selectedOptions).map(o => o.value);
+                const variety = document.getElementById('variety-select').value;
+                
+                if (selectedRegions.length < 2) {
+                    alert('请至少选择2个地区进行对比');
+                    return;
+                }
+                
+                // 获取所有选中地区的数据
+                selectedRegions.forEach((region, i) => {
+                    const data = dataSources[variety][region];
+                    const regionName = document.querySelector(`#compare-region-select option[value="${region}"]`).text;
+                    
+                    // 为每个数据集生成随机样式
+                    const style = generateChartStyle();
+                    
+                    datasets.push({
+                        label: `${document.querySelector('#variety-select option:checked').text} (${regionName})`,
+                        data: data.map(d => d.y),
+                        ...style
+                    });
+                    
+                    // 添加图例项
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'comparison-item active';
+                    legendItem.innerHTML = `
+                        <span class="color-indicator" style="background-color: ${style.borderColor}"></span>
+                        ${regionName}
+                    `;
+                    legendContainer.appendChild(legendItem);
+                });
+                
+                labels = dataSources[variety][selectedRegions[0]].map(d => d.ds);
+            }
+            
+            renderCompareChart(datasets, labels);
+            generateCompareAnalysis(datasets);
+        }
+        
+        // 更新图表和分析
+        function updateChartAndAnalysis() {
+            const combinedData = getCombinedData();
+            renderChart(combinedData);
+            generateMarketAnalysis(combinedData);
+        }
+    </script>
+</body>
+</html>

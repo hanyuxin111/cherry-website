@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大连樱桃种植与销售平台 - 客户中心</title>
+    <style>
+        /* 样式保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #003366;
+            font-size: 28px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background-color: #4CAF50;
+            margin: 10px auto;
+        }
+
+        .search-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .search-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+        }
+
+        .search-form button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-group label {
+            margin-right: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .filter-group select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .product-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .product-info {
+            padding: 10px 0;
+        }
+
+        .product-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #003366;
+        }
+
+        .product-price {
+            color: #FF5722;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .product-origin {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .product-actions button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .add-to-cart {
+            background-color: #4CAF50;
+            color: white;
+            flex: 1;
+        }
+
+        .compare-btn {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .cart-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+            min-height: 100px;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #003366;
+        }
+
+        .cart-item-price {
+            color: #FF5722;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-quantity {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .update-quantity,
+        .remove-from-cart {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .update-quantity {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .remove-from-cart {
+            background-color: #F44336;
+            color: white;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .purchase-history-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .purchase-history-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .purchase-history-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .purchase-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .purchase-date {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .purchase-details {
+            margin-bottom: 10px;
+        }
+
+        .purchase-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .purchase-item-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .purchase-item-info {
+            flex: 1;
+        }
+
+        .purchase-item-name {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .purchase-item-price {
+            font-size: 14px;
+            color: #FF5722;
+        }
+
+        .purchase-total {
+            text-align: right;
+            font-weight: bold;
+            color: #FF5722;
+            font-size: 16px;
+        }
+
+        .purchase-actions {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background-color: #F44336;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-form input,
+            .search-form button {
+                width: 100%;
+                border-radius: 4px;
+                margin-bottom: 10px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .filter-group select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 头部导航 -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+        <nav class="nav">
+            <ul class="nav-links">
+                <li><a href="home.html">登录</a></li>
+                <li><a href="dashboard.html">首页</a></li>
+                <li><a href="planting_management.html">种植管理</a></li>
+                <li><a href="sf.html">种植决策</a></li>
+                <li><a href="bc.html">病虫害防治</a></li>
+                <li><a href="sy.html">市场行情</a></li>
+                <li><a href="sales.html">在线销售</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">客户中心</h2>
+
+        <!-- 搜索功能 -->
+        <div class="search-section">
+            <h3>商品搜索</h3>
+            <form class="search-form">
+                <input type="text" placeholder="输入关键词搜索" id="search-input">
+                <button type="button" onclick="performSearch()">搜索</button>
+            </form>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="price-min">价格区间：</label>
+                    <select id="price-min">
+                        <option value="0">不限</option>
+                        <option value="20">20元以上</option>
+                        <option value="50">50元以上</option>
+                        <option value="100">100元以上</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="variety">品种：</label>
+                    <select id="variety">
+                        <option value="all">全部品种</option>
+                        <option value="red">红灯</option>
+                        <option value="huang">黄蜜</option>
+                        <option value="heibing">黑冰</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="origin">产地：</label>
+                    <select id="origin">
+                        <option value="all">全部产地</option>
+                        <option value="dl">大连</option>
+                        <option value="yt">烟台</option>
+                        <option value="bj">北京</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="weight">重量：</label>
+                    <select id="weight">
+                        <option value="all">全部重量</option>
+                        <option value="500">500g以下</option>
+                        <option value="1000">500g - 1000g</option>
+                        <option value="1500">1000g以上</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 商品列表区域 -->
+        <div class="product-list">
+            <h3>商品列表</h3>
+            <div class="product-grid" id="product-grid">
+                <!-- 商品卡片将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <!-- 购物车区域 -->
+        <div class="cart-section">
+            <h3>购物车</h3>
+            <div class="cart-items" id="cart-items">
+                <!-- 购物车商品将通过JavaScript动态生成 -->
+                <p>您的购物车是空的</p>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">结算</button>
+        </div>
+
+        <!-- 购买历史记录 -->
+        <div class="purchase-history-section">
+            <h3>购买历史</h3>
+            <div id="purchase-history">
+                <!-- 购买历史将通过JavaScript动态生成 -->
+                <p>暂无购买记录</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+        let purchaseRecords = JSON.parse(localStorage.getItem('purchaseRecords')) || [];
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            updateCart();
+            loadPurchaseHistory();
+        });
+
+        // 加载商品列表
+        function loadProducts() {
+            const productGrid = document.getElementById('product-grid');
+            productGrid.innerHTML = '';
+
+            // 过滤出已上架的商品
+            const publishedProducts = products.filter(product => product.status === 'published');
+
+            publishedProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">¥${product.price}</div>
+                        <div class="product-origin">产地：${product.origin}</div>
+                        <div class="product-description">${product.description}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">加入购物车</button>
+                        <button class="compare-btn" onclick="addToComparison(${product.id})">加入比较</button>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+        }
+
+        // 执行搜索
+        function performSearch() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const productGrid = document.getElementById('product-grid');
+            productGrid.innerHTML = '';
+
+            const searchResults = products.filter(product =>
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.description.toLowerCase().includes(searchTerm)
+            );
+
+            const publishedSearchResults = searchResults.filter(product => product.status === 'published');
+
+            if (publishedSearchResults.length === 0) {
+                productGrid.innerHTML = '<p>没有找到符合条件的商品</p>';
+                return;
+            }
+
+            publishedSearchResults.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">¥${product.price}</div>
+                        <div class="product-origin">产地：${product.origin}</div>
+                        <div class="product-description">${product.description}</div>
+                    </div>
+                    <div class="product-actions">
+                        <button class="add-to-cart" onclick="addToCart(${product.id})">加入购物车</button>
+                        <button class="compare-btn" onclick="addToComparison(${product.id})">加入比较</button>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+        }
+
+        // 加入购物车
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const existingItem = cartItems.find(item => item.id === productId);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cartItems.push({ ...product, quantity: 1 });
+                }
+                localStorage.setItem('cart', JSON.stringify(cartItems)); // 更新 localStorage
+                alert(`已将 ${product.name} 添加到购物车`);
+                updateCart();
+            }
+        }
+
+        // 更新购物车显示
+        function updateCart() {
+            const cartItemsElement = document.getElementById('cart-items');
+            cartItemsElement.innerHTML = '';
+
+            if (cartItems.length === 0) {
+                cartItemsElement.innerHTML = '<p>您的购物车是空的</p>';
+                return;
+            }
+
+            cartItems.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">¥${item.price}</div>
+                        <div class="cart-item-quantity">数量: ${item.quantity}</div>
+                    </div>
+                    <div class="cart-actions">
+                        <button class="update-quantity">修改数量</button>
+                        <button class="remove-from-cart" onclick="removeFromCart(${item.id})">移除</button>
+                    </div>
+                `;
+                cartItemsElement.appendChild(cartItem);
+            });
+        }
+
+        // 从购物车移除商品
+        function removeFromCart(productId) {
+            cartItems = cartItems.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            updateCart();
+        }
+
+        // 结算
+        function checkout() {
+            if (cartItems.length === 0) {
+                alert('购物车为空，无法结算');
+                return;
+            }
+            alert('正在跳转到结算页面...');
+            window.location.href = 'caaa.html'; // 使用相对路径
+        }
+
+        // 加载购买历史
+        function loadPurchaseHistory() {
+            const purchaseHistoryElement = document.getElementById('purchase-history');
+            purchaseHistoryElement.innerHTML = '';
+
+            if (purchaseRecords.length === 0) {
+                purchaseHistoryElement.innerHTML = '<p>暂无购买记录</p>';
+                return;
+            }
+
+            purchaseRecords.forEach(record => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'purchase-history-item';
+                historyItem.innerHTML = `
+                    <div class="purchase-date">${new Date(record.purchaseTime).toLocaleString()}</div>
+                    <div class="purchase-details">
+                        ${record.items.map(item => `
+                            <div class="purchase-item">
+                                <img src="${item.image}" alt="${item.name}" class="purchase-item-image">
+                                <div class="purchase-item-info">
+                                    <div class="purchase-item-name">${item.name}</div>
+                                    <div class="purchase-item-price">¥${item.price} x ${item.quantity}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="purchase-total">总计: ${record.total}</div>
+                    <div class="purchase-actions">
+                        <button class="delete-btn" onclick="deletePurchase(${record.id})">删除记录</button>
+                    </div>
+                `;
+                purchaseHistoryElement.appendChild(historyItem);
+            });
+        }
+
+        // 删除购买记录（仅买家页面）
+        function deletePurchase(recordId) {
+            if (confirm('确定要删除这条购买记录吗？')) {
+                // 仅从买家的购买记录中移除，不影响卖家的订单记录
+                purchaseRecords = purchaseRecords.filter(record => record.id !== recordId);
+                localStorage.setItem('purchaseRecords', JSON.stringify(purchaseRecords));
+                loadPurchaseHistory();
+            }
+        }
+
+        // 加入比较（待实现）
+        function addToComparison(productId) {
+            console.log('加入比较功能待实现，商品ID: ', productId);
+        }
+    </script>
+</body>
+</html>

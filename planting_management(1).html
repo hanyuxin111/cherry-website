@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大连樱桃种植管理平台 - 种植管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 15px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #003366;
+            font-size: 28px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background-color: #4CAF50;
+            margin: 10px auto;
+        }
+        
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #45a049;
+        }
+        
+        .table-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        .search-bar input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        
+        .search-bar button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: #F44336;
+            color: white;
+        }
+        
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .task-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .task-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #003366;
+        }
+        
+        .task-due-date {
+            background-color: #f0f0f0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .task-description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .task-assignee {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        .task-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .status-pending {
+            background-color: #ffe0b2;
+            color: #ff8f00;
+        }
+        
+        .status-in-progress {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+        
+        .status-completed {
+            background-color: #c8e6c9;
+            color: #1b5e20;
+        }
+        
+        .task-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .task-actions button {
+            padding: 5px 10px;
+            margin-left: 5px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .maturity-reminder {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #FFEB3B;
+            color: #333;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        
+        .maturity-reminder h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .maturity-reminder p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 12px;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+       <nav class="nav">
+           <ul class="nav-links">
+       		<li><a href="home.html">登录</a></li>
+               <li><a href="dashboard.html">首页</a></li>
+               <li><a href="planting_management.html">种植管理</a></li>
+       			   <li><a href="sf.html">种植决策</a></li>
+               <li><a href="bc.html">病虫害防治</a></li>
+               <li><a href="sy.html">市场行情</a></li>
+               <li><a href="sales.html">在线销售</a></li>
+           </ul>
+       </nav>
+    </header>
+    
+    <div class="maturity-reminder" id="maturityReminder">
+        <h3>樱桃成熟提醒</h3>
+        <div id="maturityRecords"></div>
+        <p>以上樱桃即将成熟，请提前做好采摘准备。</p>
+    </div>
+    
+    <div class="container">
+        <h2 class="section-title">种植管理</h2>
+        
+        <!-- 种植记录管理 -->
+        <div class="form-section">
+            <h3>添加种植记录</h3>
+            <form id="addPlantingRecordForm">
+                <div class="form-group">
+                    <label for="variety">品种</label>
+                    <input type="text" id="variety" name="variety" required>
+                </div>
+                <div class="form-group">
+                    <label for="plantingArea">种植面积 (亩)</label>
+                    <input type="number" id="plantingArea" name="plantingArea" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="expectedHarvestTime">预计收获时间</label>
+                    <input type="date" id="expectedHarvestTime" name="expectedHarvestTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="plantingDate">种植日期</label>
+                    <input type="date" id="plantingDate" name="plantingDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="plotLocation">地块位置</label>
+                    <input type="text" id="plotLocation" name="plotLocation" required>
+                </div>
+                <button type="submit" class="btn">添加记录</button>
+            </form>
+        </div>
+        
+        <div class="table-section">
+            <h3>种植记录列表</h3>
+            <div class="search-bar">
+                <input type="search" id="searchInputRecords" placeholder="搜索记录...">
+                <button id="searchBtnRecords">搜索</button>
+            </div>
+            <table id="plantingRecordsTable">
+                <thead>
+                    <tr>
+                        <th>记录ID</th>
+                        <th>品种</th>
+                        <th>种植面积 (亩)</th>
+                        <th>预计收获时间</th>
+                        <th>种植日期</th>
+                        <th>地块位置</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 记录将通过JavaScript动态添加 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 种植任务调度 -->
+        <div class="form-section">
+            <h3>添加种植任务</h3>
+            <form id="addTaskForm">
+                <div class="form-group">
+                    <label for="taskName">任务名称</label>
+                    <input type="text" id="taskName" name="taskName" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">任务描述</label>
+                    <textarea id="taskDescription" name="taskDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="startTime">开始时间</label>
+                    <input type="datetime-local" id="startTime" name="startTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="dueDate">截止时间</label>
+                    <input type="datetime-local" id="dueDate" name="dueDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="hourlyWage">每小时工钱 (元)</label>
+                    <input type="number" id="hourlyWage" name="hourlyWage" step="0.01" required>
+                </div>
+                <button type="submit" class="btn">添加任务</button>
+            </form>
+        </div>
+        
+        <div class="table-section">
+            <h3>任务列表</h3>
+            <div class="search-bar">
+                <input type="search" id="searchInputTasks" placeholder="搜索任务...">
+                <button id="searchBtnTasks">搜索</button>
+            </div>
+            <div class="task-grid" id="tasksGrid">
+                <!-- 任务卡片将通过JavaScript动态添加 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑种植记录的模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>编辑种植记录</h2>
+            <form id="editPlantingRecordForm">
+                <input type="hidden" id="recordId" name="recordId">
+                <div class="form-group">
+                    <label for="editVariety">品种</label>
+                    <input type="text" id="editVariety" name="editVariety" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPlantingArea">种植面积 (亩)</label>
+                    <input type="number" id="editPlantingArea" name="editPlantingArea" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="editExpectedHarvestTime">预计收获时间</label>
+                    <input type="date" id="editExpectedHarvestTime" name="editExpectedHarvestTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPlantingDate">种植日期</label>
+                    <input type="date" id="editPlantingDate" name="editPlantingDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPlotLocation">地块位置</label>
+                    <input type="text" id="editPlotLocation" name="editPlotLocation" required>
+                </div>
+                <button type="submit" class="btn">保存修改</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟数据存储
+        let plantingRecords = JSON.parse(localStorage.getItem('plantingRecords')) || [];
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        
+        // DOM 元素
+        let temperatureGauge, humidityGauge, lightGauge;
+        let temperatureChart, humidityChart, lightChart;
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            initPlantingRecords();
+            initTasks();
+            checkMaturityReminders();
+        });
+        
+        // 种植记录管理功能
+        function initPlantingRecords() {
+            loadPlantingRecords();
+            setupPlantingRecordsEventListeners();
+        }
+        
+        function loadPlantingRecords() {
+            const plantingRecordsTable = document.getElementById('plantingRecordsTable').getElementsByTagName('tbody')[0];
+            plantingRecordsTable.innerHTML = '';
+            
+            plantingRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.variety}</td>
+                    <td>${record.plantingArea}</td>
+                    <td>${record.expectedHarvestTime}</td>
+                    <td>${record.plantingDate}</td>
+                    <td>${record.plotLocation}</td>
+                    <td>
+                        <button class="action-btn edit-btn" data-id="${record.id}">编辑</button>
+                        <button class="action-btn delete-btn" data-id="${record.id}">删除</button>
+                    </td>
+                `;
+                plantingRecordsTable.appendChild(row);
+            });
+        }
+        
+        function setupPlantingRecordsEventListeners() {
+            const addPlantingRecordForm = document.getElementById('addPlantingRecordForm');
+            const searchInputRecords = document.getElementById('searchInputRecords');
+            const searchBtnRecords = document.getElementById('searchBtnRecords');
+            const editModal = document.getElementById('editModal');
+            const editPlantingRecordForm = document.getElementById('editPlantingRecordForm');
+            const closeBtn = document.querySelector('.close');
+            
+            // 添加种植记录表单提交
+            addPlantingRecordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const variety = document.getElementById('variety').value;
+                const plantingArea = parseFloat(document.getElementById('plantingArea').value);
+                const expectedHarvestTime = document.getElementById('expectedHarvestTime').value;
+                const plantingDate = document.getElementById('plantingDate').value;
+                const plotLocation = document.getElementById('plotLocation').value;
+                
+                // 生成新记录
+                const newRecord = {
+                    id: Date.now(),
+                    variety,
+                    plantingArea,
+                    expectedHarvestTime,
+                    plantingDate,
+                    plotLocation
+                };
+                
+                // 添加到记录数组
+                plantingRecords.push(newRecord);
+                savePlantingRecords();
+                loadPlantingRecords();
+                
+                // 重置表单
+                addPlantingRecordForm.reset();
+            });
+            
+            // 搜索按钮点击事件
+            searchBtnRecords.addEventListener('click', function() {
+                performSearchRecords();
+            });
+            
+            // 支持回车键触发搜索
+            searchInputRecords.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearchRecords();
+                }
+            });
+            
+            function performSearchRecords() {
+                const searchTerm = document.getElementById('searchInputRecords').value.toLowerCase();
+                filterPlantingRecords(searchTerm);
+            }
+            
+            function filterPlantingRecords(searchTerm) {
+                const plantingRecordsTable = document.getElementById('plantingRecordsTable').getElementsByTagName('tbody')[0];
+                plantingRecordsTable.innerHTML = '';
+                
+                plantingRecords.forEach(record => {
+                    const values = [
+                        record.variety.toLowerCase(),
+                        record.plotLocation.toLowerCase()
+                    ];
+                    
+                    if (values.some(value => value.includes(searchTerm))) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${record.id}</td>
+                            <td>${record.variety}</td>
+                            <td>${record.plantingArea}</td>
+                            <td>${record.expectedHarvestTime}</td>
+                            <td>${record.plantingDate}</td>
+                            <td>${record.plotLocation}</td>
+                            <td>
+                                <button class="action-btn edit-btn" data-id="${record.id}">编辑</button>
+                                <button class="action-btn delete-btn" data-id="${record.id}">删除</button>
+                            </td>
+                        `;
+                        plantingRecordsTable.appendChild(row);
+                    }
+                });
+            }
+            
+            // 关闭模态框
+            closeBtn.addEventListener('click', function() {
+                editModal.style.display = 'none';
+            });
+            
+            // 点击模态框外部关闭
+            window.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    editModal.style.display = 'none';
+                }
+            });
+            
+            // 监听编辑和删除按钮
+            document.getElementById('plantingRecordsTable').addEventListener('click', function(e) {
+                if (e.target.classList.contains('edit-btn')) {
+                    const recordId = parseInt(e.target.getAttribute('data-id'));
+                    openEditPlantingModal(recordId);
+                } else if (e.target.classList.contains('delete-btn')) {
+                    const recordId = parseInt(e.target.getAttribute('data-id'));
+                    deletePlantingRecord(recordId);
+                }
+            });
+            
+            // 编辑表单提交
+            editPlantingRecordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const recordId = parseInt(document.getElementById('recordId').value);
+                const variety = document.getElementById('editVariety').value;
+                const plantingArea = parseFloat(document.getElementById('editPlantingArea').value);
+                const expectedHarvestTime = document.getElementById('editExpectedHarvestTime').value;
+                const plantingDate = document.getElementById('editPlantingDate').value;
+                const plotLocation = document.getElementById('editPlotLocation').value;
+                
+                // 更新记录
+                const recordIndex = plantingRecords.findIndex(record => record.id === recordId);
+                if (recordIndex !== -1) {
+                    plantingRecords[recordIndex] = {
+                        ...plantingRecords[recordIndex],
+                        variety,
+                        plantingArea,
+                        expectedHarvestTime,
+                        plantingDate,
+                        plotLocation
+                    };
+                    
+                    savePlantingRecords();
+                    loadPlantingRecords();
+                    editModal.style.display = 'none';
+                }
+            });
+        }
+        
+        function openEditPlantingModal(recordId) {
+            const record = plantingRecords.find(r => r.id === recordId);
+            if (record) {
+                document.getElementById('recordId').value = record.id;
+                document.getElementById('editVariety').value = record.variety;
+                document.getElementById('editPlantingArea').value = record.plantingArea;
+                document.getElementById('editExpectedHarvestTime').value = record.expectedHarvestTime;
+                document.getElementById('editPlantingDate').value = record.plantingDate;
+                document.getElementById('editPlotLocation').value = record.plotLocation;
+                
+                document.getElementById('editModal').style.display = 'block';
+            }
+        }
+        
+        function deletePlantingRecord(recordId) {
+            if (confirm('确定要删除这条记录吗？')) {
+                plantingRecords = plantingRecords.filter(record => record.id !== recordId);
+                savePlantingRecords();
+                loadPlantingRecords();
+            }
+        }
+        
+        function savePlantingRecords() {
+            localStorage.setItem('plantingRecords', JSON.stringify(plantingRecords));
+        }
+        
+        // 种植任务调度功能
+        function initTasks() {
+            loadTasks();
+            setupTasksEventListeners();
+        }
+        
+        function loadTasks() {
+            const tasksGrid = document.getElementById('tasksGrid');
+            tasksGrid.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const taskCard = document.createElement('div');
+                taskCard.className = 'task-card';
+                taskCard.innerHTML = `
+                    <div class="task-header">
+                        <h3 class="task-title">${task.name}</h3>
+                        <span class="task-due-date">${formatDateTime(task.dueDate)}</span>
+                    </div>
+                    <p class="task-description">${task.description}</p>
+                    <p class="task-assignee">负责人: ${task.assignee}</p>
+                    <p class="task-assignee">开始时间: ${formatDateTime(task.startTime)}</p>
+                    <p class="task-assignee">截止时间: ${formatDateTime(task.dueDate)}</p>
+                    <p class="task-assignee">工作时长: ${task.duration} 小时</p>
+                    <p class="task-assignee">每小时工钱: ${task.hourlyWage} 元</p>
+                    <p class="task-assignee">总工钱: ${task.totalWage} 元</p>
+                    <span class="task-status status-${task.status}">${task.status}</span>
+                    <div class="task-actions">
+                        ${task.status === '未开始' ? '<button class="action-btn start-btn">开始</button>' : ''}
+                        ${task.status === '进行中' ? '<button class="action-btn complete-btn">完成</button>' : ''}
+                        <button class="action-btn delete-btn" data-id="${task.id}">删除</button>
+                    </div>
+                `;
+                tasksGrid.appendChild(taskCard);
+            });
+        }
+        
+        function setupTasksEventListeners() {
+            const addTaskForm = document.getElementById('addTaskForm');
+            const searchInputTasks = document.getElementById('searchInputTasks');
+            const searchBtnTasks = document.getElementById('searchBtnTasks');
+            
+            // 添加任务表单提交
+            addTaskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const taskName = document.getElementById('taskName').value;
+                const taskDescription = document.getElementById('taskDescription').value;
+                const startTime = document.getElementById('startTime').value;
+                const dueDate = document.getElementById('dueDate').value;
+                const hourlyWage = parseFloat(document.getElementById('hourlyWage').value);
+                
+                // 计算工作时长和总工钱
+                const startDateTime = new Date(startTime);
+                const dueDateTime = new Date(dueDate);
+                const durationInMs = dueDateTime - startDateTime;
+                const durationInHours = durationInMs / (1000 * 60 * 60);
+                const totalWage = hourlyWage * durationInHours;
+                
+                // 生成新任务
+                const newTask = {
+                    id: Date.now(),
+                    name: taskName,
+                    description: taskDescription,
+                    startTime: startTime,
+                    dueDate: dueDate,
+                    status: '未开始',
+                    hourlyWage: hourlyWage,
+                    duration: durationInHours.toFixed(2),
+                    totalWage: totalWage.toFixed(2)
+                };
+                
+                // 添加到任务数组
+                tasks.push(newTask);
+                saveTasks();
+                loadTasks();
+                
+                // 重置表单
+                addTaskForm.reset();
+            });
+            
+            // 搜索按钮点击事件
+            searchBtnTasks.addEventListener('click', function() {
+                performSearchTasks();
+            });
+            
+            // 支持回车键触发搜索
+            searchInputTasks.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearchTasks();
+                }
+            });
+            
+            function performSearchTasks() {
+                const searchTerm = document.getElementById('searchInputTasks').value.toLowerCase();
+                filterTasks(searchTerm);
+            }
+            
+            function filterTasks(searchTerm) {
+                const tasksGrid = document.getElementById('tasksGrid');
+                tasksGrid.innerHTML = '';
+                
+                tasks.forEach(task => {
+                    const values = [
+                        task.name.toLowerCase(),
+                        task.description.toLowerCase(),
+                        task.assignee.toLowerCase()
+                    ];
+                    
+                    if (values.some(value => value.includes(searchTerm))) {
+                        const taskCard = document.createElement('div');
+                        taskCard.className = 'task-card';
+                        taskCard.innerHTML = `
+                            <div class="task-header">
+                                <h3 class="task-title">${task.name}</h3>
+                                <span class="task-due-date">${formatDateTime(task.dueDate)}</span>
+                            </div>
+                            <p class="task-description">${task.description}</p>
+                            <p class="task-assignee">负责人: ${task.assignee}</p>
+                            <p class="task-assignee">开始时间: ${formatDateTime(task.startTime)}</p>
+                            <p class="task-assignee">截止时间: ${formatDateTime(task.dueDate)}</p>
+                            <p class="task-assignee">工作时长: ${task.duration} 小时</p>
+                            <p class="task-assignee">每小时工钱: ${task.hourlyWage} 元</p>
+                            <p class="task-assignee">总工钱: ${task.totalWage} 元</p>
+                            <span class="task-status status-${task.status}">${task.status}</span>
+                            <div class="task-actions">
+                                ${task.status === '未开始' ? '<button class="action-btn start-btn">开始</button>' : ''}
+                                ${task.status === '进行中' ? '<button class="action-btn complete-btn">完成</button>' : ''}
+                                <button class="action-btn delete-btn" data-id="${task.id}">删除</button>
+                            </div>
+                        `;
+                        tasksGrid.appendChild(taskCard);
+                    }
+                });
+            }
+            
+            // 监听任务操作按钮
+            document.getElementById('tasksGrid').addEventListener('click', function(e) {
+                if (e.target.classList.contains('start-btn')) {
+                    const taskCard = e.target.closest('.task-card');
+                    const taskId = parseInt(taskCard.querySelector('.delete-btn').dataset.id);
+                    updateTaskStatus(taskId, '进行中');
+                } else if (e.target.classList.contains('complete-btn')) {
+                    const taskCard = e.target.closest('.task-card');
+                    const taskId = parseInt(taskCard.querySelector('.delete-btn').dataset.id);
+                    updateTaskStatus(taskId, '已完成');
+                } else if (e.target.classList.contains('delete-btn')) {
+                    const taskId = parseInt(e.target.dataset.id);
+                    deleteTask(taskId);
+                }
+            });
+        }
+        
+        function formatDateTime(dateTimeString) {
+            const date = new Date(dateTimeString);
+            return date.toLocaleString();
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        function updateTaskStatus(taskId, newStatus) {
+            const taskIndex = tasks.findIndex(task => task.id === taskId);
+            if (taskIndex !== -1) {
+                tasks[taskIndex].status = newStatus;
+                saveTasks();
+                loadTasks();
+            }
+        }
+        
+        function deleteTask(taskId) {
+            if (confirm('确定要删除这条任务吗？')) {
+                tasks = tasks.filter(task => task.id !== taskId);
+                saveTasks();
+                loadTasks();
+            }
+        }
+        
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+        
+        // 成熟提醒功能
+        function checkMaturityReminders() {
+            const maturityReminder = document.getElementById('maturityReminder');
+            const maturityRecordsDiv = document.getElementById('maturityRecords');
+            let hasMaturityReminder = false;
+            
+            // 清空之前的提醒内容
+            maturityRecordsDiv.innerHTML = '';
+            
+            // 遍历种植记录，检查预计收获时间在5天内的记录
+            plantingRecords.forEach(record => {
+                const expectedHarvestTime = new Date(record.expectedHarvestTime);
+                const currentTime = new Date();
+                // 设置预计收获时间的时分秒为0，以便准确计算天数差异
+                expectedHarvestTime.setHours(0, 0, 0, 0);
+                currentTime.setHours(0, 0, 0, 0);
+                const timeDifference = expectedHarvestTime - currentTime;
+                const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+                
+                // 如果预计收获时间在5天内（包括今天）
+                if (daysDifference >= 0 && daysDifference <= 5) {
+                    hasMaturityReminder = true;
+                    
+                    // 创建提醒项
+                    const recordElement = document.createElement('div');
+                    recordElement.style.marginBottom = '8px';
+                    recordElement.innerHTML = `
+                        <strong>品种: </strong>${record.variety}<br>
+                        <strong>预计收获时间: </strong>${formatDate(record.expectedHarvestTime)}
+                    `;
+                    maturityRecordsDiv.appendChild(recordElement);
+                }
+            });
+            
+            // 如果有成熟提醒，显示提醒框
+            if (hasMaturityReminder) {
+                maturityReminder.style.display = 'block';
+            } else {
+                maturityReminder.style.display = 'none';
+            }
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        // 页面加载时检查成熟提醒
+        document.addEventListener('DOMContentLoaded', function() {
+            // 其他初始化代码...
+            checkMaturityReminders(); // 检查成熟提醒
+        });
+        
+        // 添加新种植记录时，更新成熟提醒
+        function addPlantingRecord() {
+            // 添加记录的代码...
+            
+            // 添加记录后重新检查成熟提醒
+            checkMaturityReminders();
+        }
+        
+        // 编辑种植记录时，更新成熟提醒
+        function updatePlantingRecord(recordId) {
+            // 更新记录的代码...
+            
+            // 更新记录后重新检查成熟提醒
+            checkMaturityReminders();
+        }
+        
+        // 删除种植记录时，更新成熟提醒
+        function deletePlantingRecord(recordId) {
+            if (confirm('确定要删除这条记录吗？')) {
+                plantingRecords = plantingRecords.filter(record => record.id !== recordId);
+                savePlantingRecords();
+                loadPlantingRecords();
+                
+                // 删除记录后重新检查成熟提醒
+                checkMaturityReminders();
+            }
+        }
+    </script>
+</body>
+</html>

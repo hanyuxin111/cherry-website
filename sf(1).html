@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樱桃种植决策</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .decision-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .header {
+            background-color: #003;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 20px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 17px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+        
+        .banner {
+            height: 200px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            overflow: hidden;
+            background-color: #4CAF50;
+        }
+        
+        .banner h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .banner p {
+            font-size: 16px;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        .input-card {
+            background: white;
+            margin: 20px 0;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            margin-top: 30px;
+            background: #4CAF50;
+            border: none;
+            height: 40px;
+            border-radius: 4px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .submit-btn:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .result-card {
+            margin: 20px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .suggestions {
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 30px;
+        }
+        
+        .suggestion-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .suggestion-item {
+            margin-bottom: 15px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .risk-tag {
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .weather-card {
+            margin: 20px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        
+        .weather-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .weather-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .weather-icon {
+            font-size: 36px;
+            margin-right: 15px;
+            color: #4CAF50;
+        }
+        
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .weather-detail {
+            display: flex;
+            align-items: center;
+        }
+        
+        .weather-detail i {
+            margin-right: 8px;
+            color: #4CAF50;
+        }
+        
+        .loading-weather {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .weather-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-card, .result-card, .weather-card {
+                margin: 10px 0;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+       <nav class="nav">
+           <ul class="nav-links">
+       		<li><a href="home.html">登录</a></li>
+               <li><a href="dashboard.html">首页</a></li>
+               <li><a href="planting_management.html">种植管理</a></li>
+       			   <li><a href="sf.html">种植决策</a></li>
+               <li><a href="bc.html">病虫害防治</a></li>
+               <li><a href="sy.html">市场行情</a></li>
+               <li><a href="sales.html">在线销售</a></li>
+           </ul>
+       </nav>
+    </header>
+    
+    <section class="banner">
+        <h2>樱桃种植决策</h2>
+        <p>基于实时天气数据的种植风险评估</p>
+    </section>
+
+    <div id="app" class="decision-container">
+        <!-- 数据输入区 -->
+        <div class="input-card">
+            <el-form :model="formData" label-width="120px">
+                <el-form-item label="种植地区">
+                    <el-select 
+                        v-model="formData.region" 
+                        placeholder="请选择地区"
+                        @change="handleRegionChange">
+                        <el-option
+                            v-for="region in regions"
+                            :key="region.value"
+                            :label="region.label"
+                            :value="region.value">
+                            <span style="float: left">{{ region.label }}</span>
+                            <span style="float: right; color: #8492a6; font-size: 13px">
+                                {{ region.city }}
+                            </span>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                
+                <el-form-item label="土壤pH值">
+                    <el-slider v-model="formData.ph" :min="4" :max="8" :step="0.1" show-input></el-slider>
+                </el-form-item>
+                
+                <el-form-item label="近期降雨量(mm)">
+                    <el-slider v-model="formData.rainfall" :min="0" :max="300" :step="10" show-input></el-slider>
+                </el-form-item>
+                
+                <el-form-item label="已发现病虫害">
+                    <el-checkbox-group v-model="formData.pests">
+                        <el-checkbox v-for="pest in pestOptions" :key="pest.value" :label="pest.value">
+                            {{ pest.label }}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                </el-form-item>
+            </el-form>
+            
+            <button class="submit-btn" @click="calculate" :disabled="loading">
+                {{ loading ? '计算中...' : '生成决策建议' }}
+            </button>
+        </div>
+
+        <!-- 实时天气卡片 -->
+        <div class="weather-card">
+            <div class="weather-header">
+                <h3>实时天气</h3>
+                <small>更新时间: {{ weather.updateTime || '--' }}</small>
+            </div>
+            
+            <div v-if="weather.loading" class="loading-weather">
+                <i class="el-icon-loading"></i> 正在获取天气数据...
+            </div>
+            
+            <div v-else-if="weather.error" class="loading-weather">
+                <i class="el-icon-warning"></i> {{ weather.error }}
+            </div>
+            
+            <div v-else>
+                <div class="weather-info">
+                    <div class="weather-icon">
+                        <i :class="weatherIcon"></i>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0">{{ weather.temperature }}°C</h2>
+                        <p style="margin: 5px 0; color: #666">{{ weather.description }}</p>
+                        <p style="margin: 0; font-size: 14px; color: #999">
+                            {{ selectedRegion.label }} · {{ weather.time }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="weather-details">
+                    <div class="weather-detail">
+                        <i class="el-icon-umbrella"></i>
+                        <span>降水量: {{ weather.precipitation }} mm</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="el-icon-wind-power"></i>
+                        <span>风速: {{ weather.windspeed }} km/h</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="el-icon-sunny"></i>
+                        <span>日出: {{ weather.sunrise }}</span>
+                    </div>
+                    <div class="weather-detail">
+                        <i class="el-icon-moon"></i>
+                        <span>日落: {{ weather.sunset }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结果展示 -->
+        <div v-if="showResult" class="result-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>风险评估报告</h3>
+                <span class="risk-tag">{{ riskLevel.text }}</span>
+            </div>
+            
+            <div id="chart" class="chart-container"></div>
+            
+            <div class="suggestions">
+                <div class="suggestion-title">
+                    <i class="el-icon-flag"></i>
+                    <span>专家建议</span>
+                </div>
+                <div v-for="(item,index) in suggestions" :key="index" class="suggestion-item">
+                    {{ index+1 }}. {{ item }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 地区坐标配置（主要樱桃产区）
+        const REGION_COORDINATES = {
+            'dalian': { label: '辽宁大连', city: '大连', lat: 38.9, lon: 121.6 },
+            'yantai': { label: '山东烟台', city: '烟台', lat: 37.5, lon: 121.4 },
+            'xian': { label: '陕西西安', city: '西安', lat: 34.3, lon: 108.9 },
+            'chengdu': { label: '四川成都', city: '成都', lat: 30.6, lon: 104.1 }
+        };
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    formData: {
+                        region: 'dalian',
+                        ph: 6.5,
+                        rainfall: 50,
+                        pests: []
+                    },
+                    regions: Object.keys(REGION_COORDINATES).map(key => ({
+                        value: key,
+                        label: REGION_COORDINATES[key].label,
+                        city: REGION_COORDINATES[key].city
+                    })),
+                    pestOptions: [
+                        { value: 'aphid', label: '蚜虫' },
+                        { value: 'moth', label: '果蝇' },
+                        { value: 'fungus', label: '褐斑病' }
+                    ],
+                    loading: false,
+                    showResult: false,
+                    riskLevel: { text: '中等风险' },
+                    suggestions: [],
+                    chart: null,
+                    weather: {
+                        loading: true,
+                        error: null,
+                        updateTime: null,
+                        temperature: '--',
+                        description: '--',
+                        precipitation: '--',
+                        windspeed: '--',
+                        sunrise: '--',
+                        sunset: '--',
+                        time: '--'
+                    },
+                    weatherIcons: {
+                        0: 'el-icon-sunny',
+                        1: 'el-icon-sunny',
+                        2: 'el-icon-cloudy',
+                        3: 'el-icon-overcast',
+                        45: 'el-icon-fog',
+                        61: 'el-icon-light-rain',
+                        63: 'el-icon-heavy-rain',
+                        80: 'el-icon-showers'
+                    },
+                    weatherInterval: null
+                }
+            },
+            computed: {
+                selectedRegion() {
+                    return REGION_COORDINATES[this.formData.region] || REGION_COORDINATES.dalian;
+                },
+                weatherIcon() {
+                    if (!this.weather.weathercode) return 'el-icon-question';
+                    return this.weatherIcons[this.weather.weathercode] || 'el-icon-question';
+                }
+            },
+            created() {
+                this.fetchWeather();
+                // 每1小时自动更新天气
+                this.weatherInterval = setInterval(this.fetchWeather, 3600000);
+            },
+            beforeDestroy() {
+                clearInterval(this.weatherInterval);
+            },
+            methods: {
+                // 获取实时天气数据
+                async fetchWeather() {
+                    this.weather.loading = true;
+                    this.weather.error = null;
+                    
+                    try {
+                        const region = this.selectedRegion;
+                        const response = await axios.get('https://api.open-meteo.com/v1/forecast', {
+                            params: {
+                                latitude: region.lat,
+                                longitude: region.lon,
+                                current: 'temperature_2m,weather_code,precipitation,wind_speed_10m',
+                                daily: 'sunrise,sunset',
+                                timezone: 'auto',
+                                forecast_days: 1
+                            }
+                        });
+                        
+                        const data = response.data;
+                        const weatherCode = data.current.weather_code;
+                        
+                        this.weather = {
+                            loading: false,
+                            temperature: data.current.temperature_2m,
+                            weathercode: weatherCode,
+                            description: this.getWeatherDescription(weatherCode),
+                            precipitation: data.current.precipitation,
+                            windspeed: data.current.wind_speed_10m,
+                            sunrise: data.daily.sunrise[0].split('T')[1].substring(0, 5),
+                            sunset: data.daily.sunset[0].split('T')[1].substring(0, 5),
+                            time: new Date().toLocaleTimeString(),
+                            updateTime: new Date().toLocaleString()
+                        };
+                        
+                    } catch (error) {
+                        console.error('获取天气失败:', error);
+                        this.weather.loading = false;
+                        this.weather.error = '获取天气数据失败，请稍后刷新';
+                    }
+                },
+                
+                // 天气代码转描述
+                getWeatherDescription(code) {
+                    const descriptions = {
+                        0: '晴天',
+                        1: '晴天',
+                        2: '多云',
+                        3: '阴天',
+                        45: '雾',
+                        51: '轻雾雨',
+                        53: '中雾雨',
+                        55: '浓雾雨',
+                        61: '小雨',
+                        63: '中雨',
+                        65: '大雨',
+                        80: '阵雨',
+                        81: '强阵雨',
+                        82: '暴雨'
+                    };
+                    return descriptions[code] || '未知天气';
+                },
+                
+                // 地区变更处理
+                handleRegionChange() {
+                    this.fetchWeather();
+                },
+                
+                calculate() {
+                    this.loading = true;
+                    this.showResult = false;
+                    
+                    // 模拟计算过程
+                    setTimeout(() => {
+                        const riskScore = this.calculateRisk();
+                        this.riskLevel = riskScore > 70 ? 
+                            { text: '高风险' } : 
+                            riskScore > 30 ? 
+                            { text: '中等风险' } : 
+                            { text: '低风险' };
+                        
+                        this.suggestions = this.generateSuggestions();
+                        this.showResult = true;
+                        this.loading = false;
+                        
+                        this.$nextTick(() => {
+                            this.renderChart();
+                        });
+                    }, 1500);
+                },
+                
+                calculateRisk() {
+                    let score = 0;
+                    score += this.formData.pests.length * 15;
+                    score += (this.formData.ph < 5.5 || this.formData.ph > 7.5) ? 20 : 0;
+                    score += (this.formData.rainfall > 100) ? 25 : 0;
+                    
+                    // 根据实时天气增加风险
+                    if (this.weather.precipitation > 10) score += 15;
+                    if (this.weather.weathercode >= 80) score += 20; // 暴雨天气
+                    
+                    return Math.min(score, 100);
+                },
+                
+                generateSuggestions() {
+                    const suggestions = [];
+                    const region = this.selectedRegion.label;
+                    
+                    // 天气相关建议
+                    if (this.weather.precipitation > 20) {
+                        suggestions.push(`预计强降雨，请做好排水准备`);
+                    } else if (this.weather.weathercode <= 1) {
+                        suggestions.push(`晴天注意灌溉保湿`);
+                    }
+                    
+                    // 地区特有建议
+                    if (region.includes('大连')) {
+                        suggestions.push('大连地区建议增加防海风措施');
+                    } else if (region.includes('烟台')) {
+                        suggestions.push('烟台地区注意春季晚霜冻');
+                    }
+                    
+                    // 病虫害建议
+                    if (this.formData.pests.includes('fungus') && this.weather.precipitation > 5) {
+                        suggestions.push('潮湿天气易发褐斑病，建议喷洒杀菌剂');
+                    }
+                    
+                    return suggestions.length > 0 ? suggestions : ['当前种植条件良好，保持现有管理方案'];
+                },
+                
+                renderChart() {
+                    const chartDom = document.getElementById('chart');
+                    if (!chartDom) return;
+                    
+                    this.chart = echarts.init(chartDom);
+                    const option = {
+                        tooltip: {
+                            trigger: 'axis'
+                        },
+                        radar: {
+                            indicator: [
+                                { name: '病害风险', max: 100 },
+                                { name: '虫害风险', max: 100 },
+                                { name: '气象风险', max: 100 },
+                                { name: '土壤风险', max: 100 },
+                                { name: '管理风险', max: 100 }
+                            ],
+                            radius: '65%'
+                        },
+                        series: [{
+                            type: 'radar',
+                            data: [{
+                                value: [
+                                    this.formData.pests.includes('fungus') ? 80 : 30,
+                                    this.formData.pests.length * 25,
+                                    this.weather.precipitation > 20 ? 70 : 40,
+                                    100 - Math.abs(this.formData.ph - 6.5) * 20,
+                                    50
+                                ],
+                                name: '风险指标',
+                                areaStyle: {
+                                    color: 'rgba(76, 175, 80, 0.4)'
+                                },
+                                lineStyle: {
+                                    color: '#4CAF50',
+                                    width: 2
+                                }
+                            }]
+                        }]
+                    };
+                    this.chart.setOption(option);
+                    
+                    window.addEventListener('resize', () => {
+                        this.chart && this.chart.resize();
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

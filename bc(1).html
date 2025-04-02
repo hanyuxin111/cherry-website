@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大连樱桃种植管理平台 - 病虫识别与防护</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.18.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 15px;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #003366;
+            font-size: 28px;
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background-color: #4CAF50;
+            margin: 10px auto;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+        }
+        
+        .upload-section {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+        }
+        
+        .upload-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+        }
+        
+        .upload-btn i {
+            font-size: 40px;
+        }
+        
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1;
+        }
+        
+        .uploaded-image {
+            max-width: 300px;
+            max-height: 200px;
+            margin: 20px auto;
+            display: none;
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result-info {
+            margin-bottom: 20px;
+        }
+        
+        .result-info h3 {
+            margin-bottom: 10px;
+            color: #003366;
+        }
+        
+        .result-info p {
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .recommendations {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .recommendations h4 {
+            margin-bottom: 10px;
+            color: #003366;
+        }
+        
+        .recommendations ul {
+            padding-left: 20px;
+        }
+        
+        .recommendations li {
+            margin-bottom: 8px;
+            color: #555;
+        }
+        
+        .processing-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .processing-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .processing-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .pest-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .pest-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: calc(33.33% - 20px);
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .pest-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pest-image {
+            height: 180px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .pest-info {
+            padding: 15px;
+        }
+        
+        .pest-info h3 {
+            margin-bottom: 8px;
+            color: #003366;
+        }
+        
+        .pest-info p {
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .knowledge-base {
+            margin-top: 30px;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .article-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .article-card {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .article-image {
+            width: 100px;
+            height: 80px;
+            background-color: #f0f0f0;
+            flex-shrink: 0;
+        }
+        
+        .article-info {
+            flex: 1;
+        }
+        
+        .article-info h3 {
+            margin-bottom: 8px;
+            color: #003366;
+            font-size: 16px;
+        }
+        
+        .article-info p {
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .article-info span {
+            color: #888;
+            font-size: 12px;
+        }
+        
+        .read-more {
+            color: #4CAF50;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .alerts-section {
+            margin-top: 30px;
+        }
+        
+        .alert-card {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffeeba;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-card h3 {
+            margin-bottom: 10px;
+            color: #856404;
+        }
+        
+        .alert-card p {
+            margin-bottom: 5px;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .history-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .history-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .table-of-contents {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .table-of-contents h3 {
+            margin-bottom: 15px;
+            color: #003366;
+        }
+        
+        .table-of-contents ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .table-of-contents ul li {
+            margin-bottom: 10px;
+        }
+        
+        .table-of-contents ul li a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .table-of-contents ul li a:hover {
+            text-decoration: underline;
+        }
+        
+        .book-content {
+            margin-top: 20px;
+        }
+        
+        .chapter {
+            margin-bottom: 30px;
+        }
+        
+        .chapter h3 {
+            margin-bottom: 15px;
+            color: #003366;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .chapter-section {
+            margin-bottom: 20px;
+        }
+        
+        .chapter-section h4 {
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+        
+        .chapter-section p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .chapter-section ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .chapter-section ul li {
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        .chapter-section ul li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+        }
+        
+        @media (max-width: 768px) {
+            .pest-card {
+                max-width: calc(50% - 20px);
+            }
+            
+            .article-card {
+                flex-direction: column;
+            }
+            
+            .article-image {
+                width: 100%;
+                height: 150px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .pest-card {
+                max-width: 100%;
+            }
+        }
+
+        /* 新增的种植技术交流社区样式 */
+        .community {
+            margin-top: 30px;
+        }
+
+        .post-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .post-text {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            min-height: 80px;
+        }
+
+        .post-btn {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .post-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .post-author {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .post-time {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .post-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .post-image {
+            max-width: 150px;
+            max-height: 100px;
+            background-color: #f0f0f0;
+        }
+
+        .comment-section {
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .comment-form {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .comment-text {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .comment-btn {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .comments-list {
+            margin-top: 10px;
+        }
+
+        .comment-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .comment-author {
+            font-weight: bold;
+            color: #003366;
+        }
+
+        .comment-time {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .comment-content {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+        <nav class="nav">
+            <ul class="nav-links">
+                <li><a href="dashboard.html">首页</a></li>
+                <li><a href="planting_management.html">种植管理</a></li>
+                <li><a href="bc.html">病虫害防治</a></li>
+                <li><a href="sy.html">市场行情</a></li>
+                <li><a href="sale.html">在线销售</a></li>
+                <li><a href="#">客户关系</a></li>
+                <li><a href="sf.html">数据分析</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h2 class="section-title">病虫识别与防护</h2>
+        
+        <!-- 病虫害图片上传识别 -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-camera"></i> 病虫害图片上传识别
+            </div>
+            <div class="upload-section">
+                <div class="upload-btn">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" class="file-input" id="imageUpload" accept="image/*">
+                </div>
+                <p>点击上方相机图标上传樱桃叶片或果实的图片进行病虫害识别</p>
+                <div class="uploaded-image" id="uploadedImage"></div>
+            </div>
+            <div class="result-container" id="resultContainer">
+                <div class="result-info">
+                    <h3 id="pestName">病虫害名称</h3>
+                    <p><strong>严重程度:</strong> <span id="severity">严重程度描述</span></p>
+                    <p><strong>匹配度:</strong> <span id="matchRate">匹配度百分比</span></p>
+                </div>
+                <div class="recommendations">
+                    <h4>防治建议</h4>
+                    <ul id="recommendationList">
+                        <li>建议使用对应的农药进行处理</li>
+                        <li>注意处理时间和频率</li>
+                        <li>结合物理和生物防治方法</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 常见病虫害图谱 -->
+        <div class="card">
+            <div class="card-title">
+                <i class="fas fa-bug"></i> 常见病虫害图谱
+            </div>
+            <div class="pest-gallery" id="pestGallery">
+                <!-- 病虫害卡片将通过JavaScript动态添加 -->
+            </div>
+        </div>
+        
+        <!-- 种植技术交流社区 -->
+        <div class="card community">
+            <div class="card-title">
+                <i class="fas fa-comments"></i> 种植技术交流社区
+            </div>
+            <div class="post-form">
+                <textarea class="post-text" id="newPostText" placeholder="分享您的种植经验和技巧，或提出您的问题..."></textarea>
+                <button class="post-btn" onclick="submitNewPost()">发布</button>
+            </div>
+            <div class="posts-list" id="postsList">
+                <!-- 帖子将通过JavaScript动态添加 -->
+            </div>
+        </div>
+        
+        <!-- 预警与提醒 -->
+        <div class="card alerts-section">
+            <div class="card-title">
+                <i class="fas fa-exclamation-triangle"></i> 预警与提醒
+            </div>
+            <div class="alert-card">
+                <h3>当前季节常见病虫害预警</h3>
+                <p>根据当前季节和气候条件，以下病虫害可能发生：</p>
+                <ul>
+                    <li>樱桃褐斑病</li>
+                    <li>樱桃炭疽病</li>
+                    <li>樱桃红蜘蛛</li>
+                </ul>
+                <p>请密切关注樱桃园情况，提前做好预防措施。</p>
+            </div>
+            <div class="history-section">
+                <h3>历史识别记录</h3>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>识别时间</th>
+                            <th>病虫害名称</th>
+                            <th>严重程度</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <!-- 历史记录将通过JavaScript动态添加 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 病虫害详细信息模态框 -->
+    <div id="pestModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalPestName">病虫害名称</h2>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modalPestImage" src="" alt="病虫害图片">
+                </div>
+                <div class="modal-description">
+                    <h3>症状描述</h3>
+                    <p id="modalDescription">症状描述内容</p>
+                    <h3>防治方法</h3>
+                    <ul id="modalRecommendations">
+                        <li>防治方法1</li>
+                        <li>防治方法2</li>
+                        <li>防治方法3</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 图片处理模态框 -->
+    <div class="processing-modal" id="processingModal">
+        <div class="processing-content">
+            <div class="processing-spinner"></div>
+            <h3>正在识别病虫害，请稍候...</h3>
+        </div>
+    </div>
+    
+    <script>
+        // 模拟数据
+        const pests = [
+            {
+                id: 1,
+                name: "樱桃褐斑病",
+                description: "樱桃褐斑病主要危害叶片，严重时也危害果实。叶片染病后，病斑呈圆形或近圆形，直径2-4mm，病斑边缘紫褐色，中间灰白色，具明显同心轮纹。",
+                image: "https://tse1-mm.cn.bing.net/th/id/OIP-C.bMEHmVvL48-hAy402E84JAHaE8?rs=1&pid=ImgDetMain",
+                recommendations: [
+                    "及时清除病残体，减少菌源",
+                    "发病初期喷洒70%甲基托布津可湿性粉剂1000倍液",
+                    "合理修剪，增强树体内通风透光性"
+                ]
+            },
+            {
+                id: 2,
+                name: "樱桃炭疽病",
+                description: "樱桃炭疽病主要危害果实，也危害叶片和新梢。果实染病后，初呈褐色圆形小斑点，逐渐扩大成紫黑色圆形或椭圆形病斑。",
+                image: "https://tse3-mm.cn.bing.net/th/id/OIP-C.hj3aAL7F2VkrZ5okEtbm7gHaF0?rs=1&pid=ImgDetMain",
+                recommendations: [
+                    "加强果园管理，增强树势，提高抗病能力",
+                    "果实采收后，喷洒50%多菌灵可湿性粉剂800倍液",
+                    "及时摘除病果，减少再侵染源"
+                ]
+            },
+            {
+                id: 3,
+                name: "樱桃蚜虫",
+                description: "樱桃蚜虫主要危害樱桃的嫩梢、幼叶和花器。被害叶片卷曲、变形，生长受阻，严重时整个植株枯萎。",
+                image: "https://tse1-mm.cn.bing.net/th/id/OIP-C._p4Uku4jKmIkyt_qxddIzQHaFj?rs=1&pid=ImgDetMain",
+                recommendations: [
+                    "早春刮除老翘皮，消灭越冬卵",
+                    "蚜虫发生期，喷洒10%吡虫啉可湿性粉剂2000倍液",
+                    "保护和利用天敌，如瓢虫、草蛉等"
+                ]
+            },
+            {
+                id: 4,
+                name: "樱桃红蜘蛛",
+                description: "樱桃红蜘蛛主要危害叶片，被害叶片初期出现黄白色小斑点，后逐渐扩大成白色透明斑块，严重时叶片焦枯脱落。",
+                image: "https://www.tengbenyueji.com/d/file/201804/1522735086439265.jpg",
+                recommendations: [
+                    "冬季清除园内枯枝落叶，减少越冬虫源",
+                    "发生初期，喷洒1.8%阿维菌素乳油3000倍液",
+                    "合理施肥浇水，增强树体抗虫能力"
+                ]
+            },
+            {
+                id: 5,
+                name: "樱桃黑星病",
+                description: "樱桃黑星病主要危害叶片和果实。叶片上出现黑色圆形小斑点，严重时叶片枯黄脱落。",
+                image: "https://k.sinaimg.cn/n/sinakd20201011s/145/w573h372/20201011/13cd-kakmcxc8687280.jpg/w700d1q75cms.jpg?by=cms_fixed_width",
+                recommendations: [
+                    "及时清除病叶、病果，减少菌源",
+                    "发病初期喷洒75%百菌清可湿性粉剂600倍液",
+                    "合理修剪，改善通风透光条件"
+                ]
+            },
+            {
+                id: 6,
+                name: "樱桃缩叶病",
+                description: "樱桃缩叶病主要危害叶片，叶片变形、皱缩，呈红褐色，严重时早期脱落。",
+                image: "https://p1.ssl.qhimg.com/t0163a17048ab0a9512.jpg",
+                recommendations: [
+                    "早春展叶前喷洒3-5波美度石硫合剂",
+                    "发病初期喷洒50%多菌灵可湿性粉剂800倍液",
+                    "及时摘除病叶，减少菌源"
+                ]
+            }
+        ];
+        
+        // 模拟登录用户数据
+        const loginUser = {
+            id: 1,
+            name: "张三", // 登录用户的姓名
+            // 其他用户信息...
+        };
+        
+        // DOM元素
+        const imageUpload = document.getElementById('imageUpload');
+        const resultContainer = document.getElementById('resultContainer');
+        const pestGallery = document.getElementById('pestGallery');
+        const historyTableBody = document.getElementById('historyTableBody');
+        const pestModal = document.getElementById('pestModal');
+        const closeBtn = document.querySelector('.close');
+        const processingModal = document.getElementById('processingModal');
+        const uploadedImage = document.getElementById('uploadedImage');
+        
+        let model;
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', async function() {
+            initPestGallery();
+            initHistoryRecords();
+            
+            // 加载预训练模型
+            try {
+                model = await tf.loadLayersModel('path/to/your/trained/model.json');
+                console.log('模型加载成功');
+            } catch (error) {
+                console.error('模型加载失败:', error);
+            }
+        });
+        
+        // 病虫害图谱初始化
+        function initPestGallery() {
+            pests.forEach(pest => {
+                const pestCard = document.createElement('div');
+                pestCard.className = 'pest-card';
+                pestCard.innerHTML = `
+                    <div class="pest-image">
+                        <img src="${pest.image}" alt="${pest.name}" style="max-width: 100%; height: auto; display: block;">
+                    </div>
+                    <div class="pest-info">
+                        <h3 style="color: #4CAF50; margin-bottom: 10px;">${pest.name}</h3>
+                        <p style="font-size: 14px; line-height: 1.5; margin-bottom: 15px;">${pest.description}</p>
+                        <button class="btn" onclick="openPestModal(${pest.id})" style="background-color: #4CAF50; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">查看详情</button>
+                    </div>
+                `;
+                pestGallery.appendChild(pestCard);
+            });
+        }
+        
+        // 历史记录初始化
+        function initHistoryRecords() {
+            // 这里模拟历史记录数据
+            const historyData = [
+                { date: "2023-06-10", pestName: "樱桃褐斑病", severity: "中度" },
+                { date: "2023-06-05", pestName: "樱桃蚜虫", severity: "轻度" },
+                { date: "2023-05-28", pestName: "樱桃炭疽病", severity: "重度" }
+            ];
+            
+            historyData.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.pestName}</td>
+                    <td>${record.severity}</td>
+                    <td><button class="btn">查看详情</button></td>
+                `;
+                historyTableBody.appendChild(row);
+            });
+        }
+        
+        // 图片上传按钮点击事件
+        imageUpload.addEventListener('change', async function() {
+            if (this.files && this.files[0]) {
+                // 显示处理模态框
+                processingModal.style.display = 'flex';
+                
+                const file = this.files[0];
+                const imageUrl = URL.createObjectURL(file);
+                
+                // 显示上传的图片
+                const imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.style.maxWidth = '300px';
+                imgElement.style.maxHeight = '200px';
+                imgElement.style.display = 'block';
+                imgElement.style.margin = '20px auto';
+                uploadedImage.innerHTML = '';
+                uploadedImage.appendChild(imgElement);
+                uploadedImage.style.display = 'block';
+                
+                // 在实际应用中，这里应该将图片发送到后端进行识别
+                // 或者使用预训练的模型进行本地识别
+                // 这里模拟识别过程
+                setTimeout(() => {
+                    showRecognitionResult();
+                    processingModal.style.display = 'none';
+                }, 2000);
+                
+                // 重置文件输入
+                this.value = '';
+            }
+        });
+        
+        // 模拟识别结果展示
+        function showRecognitionResult() {
+            // 模拟识别结果
+            const recognitionResult = {
+                name: "樱桃褐斑病",
+                severity: "中度",
+                matchRate: "95%",
+                recommendations: [
+                    "及时清除病残体，减少菌源",
+                    "发病初期喷洒70%甲基托布津可湿性粉剂1000倍液",
+                    "合理修剪，增强树体内通风透光性"
+                ]
+            };
+            
+            // 更新识别结果
+            document.getElementById('pestName').textContent = recognitionResult.name;
+            document.getElementById('severity').textContent = recognitionResult.severity;
+            document.getElementById('matchRate').textContent = recognitionResult.matchRate;
+            
+            // 更新防治建议
+            const recommendationList = document.getElementById('recommendationList');
+            recommendationList.innerHTML = '';
+            recognitionResult.recommendations.forEach(rec => {
+                const li = document.createElement('li');
+                li.textContent = rec;
+                recommendationList.appendChild(li);
+            });
+            
+            // 显示识别结果容器
+            resultContainer.style.display = 'block';
+        }
+        
+        // 打开病虫害详细信息模态框
+        function openPestModal(pestId) {
+            const pest = pests.find(p => p.id === pestId);
+            if (pest) {
+                document.getElementById('modalPestName').textContent = pest.name;
+                document.getElementById('modalPestImage').src = pest.image;
+                document.getElementById('modalDescription').textContent = pest.description;
+                
+                const modalRecommendations = document.getElementById('modalRecommendations');
+                modalRecommendations.innerHTML = '';
+                pest.recommendations.forEach(rec => {
+                    const li = document.createElement('li');
+                    li.textContent = rec;
+                    modalRecommendations.appendChild(li);
+                });
+                
+                pestModal.style.display = 'block';
+            }
+        }
+        
+        // 关闭模态框
+        closeBtn.addEventListener('click', function() {
+            pestModal.style.display = 'none';
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(e) {
+            if (e.target === pestModal) {
+                pestModal.style.display = 'none';
+            }
+        });
+        
+        // 种植技术交流社区功能
+        let posts = [
+            {
+                id: 1,
+                author: getMaskedName("果农张"),
+                time: "2023-06-15 10:30",
+                content: "最近发现樱桃树的叶子有些卷曲，不知道是什么原因，有没有经验丰富的果农朋友能给点建议？",
+                images: [],
+                comments: [
+                    {
+                        author: getMaskedName("技术员李"),
+                        time: "2023-06-15 11:00",
+                        content: "可能是蚜虫危害，可以仔细检查一下叶片背面，如果有蚜虫，可以喷洒吡虫啉进行防治。"
+                    },
+                    {
+                        author: getMaskedName("老果农王"),
+                        time: "2023-06-15 11:30",
+                        content: "也有可能是缺水引起的，最近天气炎热，要保证充足的灌溉。"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                author: getMaskedName("种植新手"),
+                time: "2023-06-14 16:45",
+                content: "今年第一次种植樱桃，想问问大家什么时候该施肥，施什么肥比较好？",
+                images: [],
+                comments: [
+                    {
+                        author: getMaskedName("农业专家赵"),
+                        time: "2023-06-14 17:10",
+                        content: "樱桃树在不同生长阶段需肥不同，一般在萌芽前、花后、果实膨大期和采果后都需要施肥。萌芽前以氮肥为主，花后和果实膨大期以磷钾肥为主，采果后施有机肥。"
+                    },
+                    {
+                        author: getMaskedName("果农陈"),
+                        time: "2023-06-14 17:30",
+                        content: "可以使用复合肥，按照说明书的比例进行施肥，不要过量，以免烧根。"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                author: getMaskedName("果农刘"),
+                time: "2023-06-12 09:15",
+                content: "分享一下我去年修剪樱桃树的经验，合理的修剪对提高产量很重要哦！",
+                images: [
+                    "https://example.com/pruning1.jpg",
+                    "https://example.com/pruning2.jpg"
+                ],
+                comments: []
+            }
+        ];
+        
+        // 提交新帖子
+        function submitNewPost() {
+            const newPostText = document.getElementById('newPostText').value.trim();
+            if (newPostText) {
+                const newPost = {
+                    id: Date.now(),
+                    author: getMaskedName(loginUser.name), // 使用登录用户的姓氏加**
+                    time: new Date().toLocaleString(),
+                    content: newPostText,
+                    images: [],
+                    comments: []
+                };
+                
+                posts.unshift(newPost);
+                document.getElementById('newPostText').value = '';
+                renderPostsList();
+            }
+        }
+        
+        // 提交评论
+        function submitComment(postId) {
+            const commentText = document.querySelector(`#commentText${postId}`).value.trim();
+            if (commentText) {
+                const post = posts.find(p => p.id === postId);
+                if (post) {
+                    const newComment = {
+                        author: getMaskedName(loginUser.name), // 使用登录用户的姓氏加**
+                        time: new Date().toLocaleString(),
+                        content: commentText
+                    };
+                    
+                    post.comments.push(newComment);
+                    document.querySelector(`#commentText${postId}`).value = '';
+                    renderPostsList();
+                }
+            }
+        }
+        
+        // 渲染帖子列表
+        function renderPostsList() {
+            const postsListElement = document.getElementById('postsList');
+            postsListElement.innerHTML = '';
+            
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-card';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <span class="post-author">${post.author}</span>
+                        <span class="post-time">${post.time}</span>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-images">
+                        ${post.images.map(img => `<div class="post-image" style="background-color: #f0f0f0;"></div>`).join('')}
+                    </div>
+                    <div class="comment-section">
+                        <div class="comment-form">
+                            <input type="text" class="comment-text" id="commentText${post.id}" placeholder="发表评论...">
+                            <button class="comment-btn" onclick="submitComment(${post.id})">发送</button>
+                        </div>
+                        <div class="comments-list">
+                            ${post.comments.map(comment => `
+                                <div class="comment-item">
+                                    <div class="comment-header">
+                                        <span class="comment-author">${comment.author}</span>
+                                        <span class="comment-time">${comment.time}</span>
+                                    </div>
+                                    <div class="comment-content">${comment.content}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                postsListElement.appendChild(postElement);
+            });
+        }
+        
+        // 页面加载时渲染帖子列表
+        window.addEventListener('load', function() {
+            renderPostsList();
+        });
+        
+        // 获取姓氏加**的函数
+        function getMaskedName(fullName) {
+            if (!fullName) return "匿名用户";
+            const surname = fullName.charAt(0); // 获取姓名的第一个字符作为姓氏
+            return `${surname}**`; // 返回姓氏加**
+        }
+    </script>
+</body>
+</html>

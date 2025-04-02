@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大连樱桃种植与销售平台 - 卖家中心</title>
+    <style>
+        /* 样式保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin: 0 15px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            background-color: #4CAF50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 30px 0 20px;
+            color: #003366;
+            font-size: 28px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background-color: #4CAF50;
+            margin: 10px auto;
+        }
+
+        .form-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-list h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #003366;
+        }
+
+        .product-price {
+            color: #FF5722;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .product-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #F44336;
+            color: white;
+        }
+
+        .batch-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .batch-actions select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .batch-actions button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filters select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 150px;
+        }
+
+        /* 订单管理 */
+        .order-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-section h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .order-item {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .order-date {
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 10px;
+        }
+
+        .order-details {
+            margin-bottom: 10px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .order-item-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .order-item-info {
+            flex: 1;
+        }
+
+        .order-item-name {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .order-item-price {
+            font-size: 14px;
+            color: #FF5722;
+        }
+
+        .order-total {
+            text-align: right;
+            font-weight: bold;
+            color: #FF5722;
+            font-size: 16px;
+        }
+
+        .order-actions {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .order-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .delete-order-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            background-color: #F44336;
+            color: white;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="https://pic.nximg.cn/file/20210227/31394912_084724145082_2.jpg" alt="Logo">
+            <h1>大连樱桃平台</h1>
+        </div>
+        <nav class="nav">
+            <ul class="nav-links">
+                <li><a href="home.html">登录</a></li>
+                <li><a href="dashboard.html">首页</a></li>
+                <li><a href="planting_management.html">种植管理</a></li>
+                <li><a href="sf.html">种植决策</a></li>
+                <li><a href="bc.html">病虫害防治</a></li>
+                <li><a href="sy.html">市场行情</a></li>
+                <li><a href="sales.html">在线销售</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">卖家中心</h2>
+
+        <!-- 商品管理部分 -->
+        <div class="form-section">
+            <h3>商品管理</h3>
+            <form id="product-form">
+                <div class="form-group">
+                    <label for="product-name">商品名称</label>
+                    <input type="text" id="product-name" name="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-price">商品价格</label>
+                    <input type="number" id="product-price" name="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-description">商品描述</label>
+                    <textarea id="product-description" name="productDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product-image">商品图片</label>
+                    <input type="file" id="product-image" name="productImage" accept="image/*" required>
+                    <img id="preview-image" class="preview-image" src="" alt="图片预览" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label for="product-stock">商品库存</label>
+                    <input type="number" id="product-stock" name="productStock" required>
+                </div>
+                <button type="submit" class="btn">上传商品</button>
+            </form>
+        </div>
+
+        <!-- 批量操作和筛选 -->
+        <div class="batch-actions">
+            <select id="batch-action">
+                <option value="">请选择批量操作</option>
+                <option value="publish">批量上架</option>
+                <option value="unpublish">批量下架</option>
+                <option value="delete">批量删除</option>
+            </select>
+            <button class="btn" onclick="performBatchAction()">执行</button>
+        </div>
+
+        <!-- 筛选条件 -->
+        <div class="filters">
+            <select id="sort-by">
+                <option value="default">默认排序</option>
+                <option value="sales">按销量排序</option>
+                <option value="stock">按库存排序</option>
+                <option value="newest">按上架时间排序</option>
+            </select>
+            <select id="status-filter">
+                <option value="all">所有商品</option>
+                <option value="published">已上架</option>
+                <option value="unpublished">已下架</option>
+            </select>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="product-list">
+            <h3>商品列表</h3>
+            <div class="product-grid" id="product-grid">
+                <!-- 商品卡片将通过JavaScript动态添加 -->
+            </div>
+        </div>
+
+        <!-- 订单管理 -->
+        <div class="order-section">
+            <h3>订单管理</h3>
+            <div id="order-list">
+                <!-- 订单列表将通过JavaScript动态生成 -->
+                <p>暂无订单记录</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据存储
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let purchaseRecords = JSON.parse(localStorage.getItem('purchaseRecords')) || [];
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProducts();
+            loadOrders();
+        });
+
+        // 商品管理功能
+        function loadProducts() {
+            const productGrid = document.getElementById('product-grid');
+            productGrid.innerHTML = '';
+            
+            const sortBy = document.getElementById('sort-by').value;
+            const statusFilter = document.getElementById('status-filter').value;
+
+            // 根据筛选条件排序和过滤商品
+            let sortedProducts = [...products];
+            if (sortBy === 'sales') {
+                sortedProducts.sort((a, b) => b.sales - a.sales);
+            } else if (sortBy === 'stock') {
+                sortedProducts.sort((a, b) => b.stock - a.stock);
+            } else if (sortBy === 'newest') {
+                sortedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            }
+
+            if (statusFilter === 'published') {
+                sortedProducts = sortedProducts.filter(product => product.status === 'published');
+            } else if (statusFilter === 'unpublished') {
+                sortedProducts = sortedProducts.filter(product => product.status === 'unpublished');
+            }
+
+            sortedProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <input type="checkbox" class="product-checkbox" data-id="${product.id}">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-price">¥${product.price}</div>
+                    <div class="product-description">${product.description}</div>
+                    <div class="product-stock">库存: ${product.stock}</div>
+                    <div class="product-actions">
+                        <button class="action-btn edit-btn" onclick="editProduct(${product.id})">编辑</button>
+                        <button class="action-btn ${product.status === 'published' ? 'unpublish-btn' : 'publish-btn'}" onclick="toggleProductStatus(${product.id})">
+                            ${product.status === 'published' ? '下架' : '上架'}
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteProduct(${product.id})">删除</button>
+                    </div>
+                `;
+                productGrid.appendChild(productCard);
+            });
+        }
+
+        // 上传商品功能
+        const productForm = document.getElementById('product-form');
+        const previewImage = document.getElementById('preview-image');
+
+        // 预览图片
+        document.getElementById('product-image').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.style.display = 'none';
+            }
+        });
+
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const productName = document.getElementById('product-name').value;
+            const productPrice = document.getElementById('product-price').value;
+            const productDescription = document.getElementById('product-description').value;
+            const productImage = document.getElementById('product-image').files[0];
+            const productStock = document.getElementById('product-stock').value;
+
+            if (!productImage) {
+                alert('请选择一张商品图片！');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const newProduct = {
+                    id: Date.now(),
+                    name: productName,
+                    price: parseFloat(productPrice),
+                    description: productDescription,
+                    image: e.target.result,
+                    stock: parseInt(productStock),
+                    status: 'unpublished', // 默认状态为未上架
+                    sales: 0,
+                    createdAt: new Date().toISOString()
+                };
+                products.push(newProduct);
+                localStorage.setItem('products', JSON.stringify(products));
+                productForm.reset();
+                previewImage.style.display = 'none';
+                alert('商品已保存！');
+                loadProducts();
+            };
+            reader.readAsDataURL(productImage);
+        });
+
+        // 批量操作
+        function performBatchAction() {
+            const action = document.getElementById('batch-action').value;
+            const checkboxes = document.querySelectorAll('.product-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('请选择要操作的商品');
+                return;
+            }
+
+            checkboxes.forEach(checkbox => {
+                const productId = parseInt(checkbox.getAttribute('data-id'));
+                if (action === 'publish') {
+                    updateProductStatus(productId, 'published');
+                } else if (action === 'unpublish') {
+                    updateProductStatus(productId, 'unpublished');
+                } else if (action === 'delete') {
+                    deleteProduct(productId);
+                }
+            });
+
+            alert('批量操作成功！');
+            loadProducts();
+        }
+
+        function updateProductStatus(productId, status) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex !== -1) {
+                products[productIndex].status = status;
+                localStorage.setItem('products', JSON.stringify(products));
+            }
+        }
+
+        function toggleProductStatus(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                product.status = product.status === 'published' ? 'unpublished' : 'published';
+                localStorage.setItem('products', JSON.stringify(products));
+                loadProducts();
+            }
+        }
+
+        function editProduct(productId) {
+            // 这里可以添加编辑商品的逻辑
+            console.log('编辑商品:', productId);
+        }
+
+        function deleteProduct(productId) {
+            if (confirm('确定要删除这个商品吗？')) {
+                products = products.filter(product => product.id !== productId);
+                localStorage.setItem('products', JSON.stringify(products));
+                loadProducts();
+            }
+        }
+
+        // 加载订单
+        function loadOrders() {
+            const orderList = document.getElementById('order-list');
+            orderList.innerHTML = '';
+
+            if (purchaseRecords.length === 0) {
+                orderList.innerHTML = '<p>暂无订单记录</p>';
+                return;
+            }
+
+            purchaseRecords.forEach(record => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'order-item';
+                orderItem.innerHTML = `
+                    <div class="order-date">${new Date(record.purchaseTime).toLocaleString()}</div>
+                    <div class="order-details">
+                        ${record.items.map(item => `
+                            <div class="order-item">
+                                <img src="${item.image}" alt="${item.name}" class="order-item-image">
+                                <div class="order-item-info">
+                                    <div class="order-item-name">${item.name}</div>
+                                    <div class="order-item-price">¥${item.price} x ${item.quantity}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="order-total">总计: ${record.total}</div>
+                    <div class="order-actions">
+                        <button class="order-btn" onclick="confirmOrder(${record.id})">确认订单</button>
+                        <button class="delete-order-btn" onclick="deleteOrder(${record.id})">删除订单</button>
+                    </div>
+                `;
+                orderList.appendChild(orderItem);
+            });
+        }
+
+        function confirmOrder(orderId) {
+            alert(`订单 ${orderId} 已确认！`);
+            // 这里可以添加确认订单的逻辑
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm('确定要删除这个订单吗？')) {
+                purchaseRecords = purchaseRecords.filter(record => record.id !== orderId);
+                localStorage.setItem('purchaseRecords', JSON.stringify(purchaseRecords));
+                loadOrders();
+            }
+        }
+    </script>
+</body>
+</html>
